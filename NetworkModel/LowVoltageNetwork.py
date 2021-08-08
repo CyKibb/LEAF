@@ -14,8 +14,6 @@ class LowVoltageNetwork:
     IEEE 1547-2018 requirements
 
     TODO:
-    Left Off Point: Need to adjust the return value from getNextState
-    1. Adjust Dynamic Models so they fit into the simulation properly
     2. Change everything so the user defines Sbase and Vbase and the results
         are given in the p.u.
     3. Adjust getinitstate and wrapper to properties
@@ -31,7 +29,6 @@ class LowVoltageNetwork:
         self.__Nflow = -1 * np.ones(
             (NodeNums, NodeNums))  # Power Flow Matrix to account for how power flows amongst buses
         np.fill_diagonal(self.__Nflow, 1)
-        # TODO: ADJUST THE MATRIX MULTIPLICATION TO INCLUDE THIS NUMBER
         # User Defined Generation and Load at Network Buses
         self.Generation = Generation  # Generation Vecotr Containing Generation Objects
         self.Loads = Loads  # Load Vector Containing Load Objects

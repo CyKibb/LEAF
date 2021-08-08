@@ -39,7 +39,8 @@ if __name__ == '__main__':
     #     np.linspace(0.0, T_tot, N)
     # )
     simLVN_ERLLoadsCase1(
-        np.linspace(0.0, T_tot, N)
+        np.linspace(0.0, T_tot, N),
+        T_tot
     )
     print("I am done... Happy Analyzing :)")
     pass

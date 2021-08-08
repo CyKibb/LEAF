@@ -26,9 +26,9 @@ def ERLCase1Define():
                 0.5,
                 377,
                 1.0,
-                0.23,
+                0.0,
                 1.0,
-                365
+                377
             ),
             SinglePhaseInverter(
                 143.94,
@@ -38,9 +38,9 @@ def ERLCase1Define():
                 0.3,
                 377,
                 1.0,
-                0.5,
+                0.0,
                 1.0,
-                379
+                377
             ),
             SinglePhaseInverter(
                 71.97,
@@ -50,7 +50,7 @@ def ERLCase1Define():
                 0.6,
                 377,
                 1.0,
-                2.6,
+                0.0,
                 1.0,
                 377
             ),
@@ -62,7 +62,7 @@ def ERLCase1Define():
                 1.0,
                 377,
                 1.0,
-                1.5,
+                0.0,
                 1.0,
                 377
             )],

@@ -80,3 +80,15 @@ class LVNetworkPlotter(object):
         plt.ylabel('Phase(radians)', fontsize=22, style='italic')
         plt.legend()
         return plt.show()
+
+    @staticmethod
+    def plotIEEE1547_cat1():
+
+        return None
+
+
+
+# class Ieee1547BoundaryPlotter(LVNetworkPlotter):
+#     @staticmethod
+#     def plotCatI():
+#

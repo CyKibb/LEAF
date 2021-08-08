@@ -102,7 +102,7 @@ class LowVoltageNetwork:
 
     @property
     def getNextStateWrapper(self):
-        return lambda State, t, f, t_int: self.getNextState(State, t, f, t_int)
+        return lambda State, t, f, t_int, busloadpowers: self.getNextState(State, t, f, t_int, busloadpowers)
 
     # Should be change to a property for future reference :/
     def getGenInitStates(self):
@@ -118,7 +118,7 @@ class LowVoltageNetwork:
 
     """ Note State format of State[:Nodenums/2] = phase & State[Nodenums/2 :] = Voltage """
 
-    def getNextState(self, State, t, f, t_int):
+    def getNextState(self, State, t, f, t_int, busloadpowers):
         # Update Phase Angle and Network Coupling State Matrices (Reshape to Column Vectors)
         self.Phi = np.array(State[0:self.NodeNums]).reshape((self.NodeNums, 1))
         self.Snwk = np.array(State[self.NodeNums:2 * self.NodeNums]).reshape((self.NodeNums, 1))
@@ -128,46 +128,55 @@ class LowVoltageNetwork:
         # Calculate Next States for Each Node in Network
         for i in range(0, self.NodeNums):
             BusIndex = [i, i + self.NodeNums]
-            LoadPowerBusI = self.Loads[i].getLoadPower(
-                State[self.NodeNums + i],               # Pass in the voltage to calculate load power
-                f[i],                                   # Pass in the bus frequency to calculate load power
-                t_int                                   # If the load is dynamic it will require the time interval
-            )  # LoadPowerBusI
             GenerationNextState = self.Generation[i].getNextState(
                 [State[index] for index in BusIndex],
                 t,
-                self.__Pnwk[i][0] + LoadPowerBusI[0],
-                self.__Qnwk[i][0] + LoadPowerBusI[1]
+                self.__Pnwk[i][0] + busloadpowers[i][0],
+                self.__Qnwk[i][0] + busloadpowers[i][1]
             )  # GenerationNextState
             dEdt.append(GenerationNextState[0])
             dThetadt.append(GenerationNextState[1])
         return dThetadt + dEdt
 
-    def __NetworkIntegrator(self, t, initialStates, f, t_int):
-        return odeint(self.getNextStateWrapper, initialStates, t, args=(f, t_int))
+    def __NetworkIntegrator(self, t, initialStates, f, t_int, busloads):
+        return odeint(self.getNextStateWrapper, initialStates, t, args=(f, t_int, busloads))
 
     """ NOTE: 
         -   State layout [theta: 0 -> nodes_nums, Voltage: node_nums -> 2*node_nums] 
         -   tload: is the timing for the disturbance function to begin execution
         -   loadfunc: is the disturbance load function to be passed in to be executed at tload.
         -   Looping Optimization on ODEint may need to be addressed?? for faster run time?
+        -   To optimize for simulation time we need to switch loops to build in operations or numpy functions
     """
-
-    def SimulateNetwork(self, ts, initialStates, init_frequency, tload=None, loadfunc=None):
+    def SimulateNetwork(self, ts, initialstates, init_frequency, tload=None, loadfunc=None, returnloads=False):
         # Append Initial States to Final System Response
-        response = [np.array(initialStates)]
+        response = [initialstates]
         frequency = [np.array(init_frequency)]
+        nwkloading = []
         # Integrate Network Dynamics Across Each Time Step ts
         for i in range(len(ts) - 1):
             # Time step for integrator
             t = [ts[i], ts[i + 1]]
+            # Get load power to run integration over at the timestamp
+            busloadpowers = []
+            for j in range(0, self.NodeNums):
+                busloadpowers.append(
+                    self.Loads[j].getLoadPower(
+                        response[i][self.NodeNums + j],  # Pass in the voltage to calculate load power
+                        frequency[i][j],  # Pass in the bus frequency to calculate load power
+                        t  # Pass in the time for dynamic loads in the nwk
+                    )
+                )
+            # Check to see user wants returned bus load powers from sim
+            if returnloads is True:
+                nwkloading.append(busloadpowers)
             # Check for Load Step function and execute if exists
-            if tload == None:
+            if tload is None:
                 pass
-            elif t[0] >= tload and loadfunc != None:
+            elif t[0] >= tload and loadfunc is not None:
                 loadfunc(self, t)
             # Integrate Network States
-            states = self.__NetworkIntegrator(t, initialStates, frequency[i], t)
+            states = self.__NetworkIntegrator(t, initialstates, frequency[i], t, busloadpowers)
             # Calculate Generator Frequency
             frequency.append(
                 ((states[1, 0:self.NodeNums] - states[0, 0:self.NodeNums]) / (ts[i + 1] - ts[i]))
@@ -175,10 +184,13 @@ class LowVoltageNetwork:
             # Adjust for Phase State 2pi overflow
             states[1, 0:self.NodeNums] = states[1, 0:self.NodeNums] % (2 * np.pi)
             # Update initial states for next iteration
-            initialStates = states[1]
+            initialstates = states[1]
             # Append simulation results list
             response.append(states[1].tolist())
-        return np.array(response), np.array(frequency)
+        if returnloads is True:
+            return np.array(response), np.array(frequency), np.array(nwkloading)
+        else:
+            return np.array(response), np.array(frequency)
 
 
 if __name__ == '__main__':

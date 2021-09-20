@@ -13,12 +13,14 @@ class LVNetworkPlotter(object):
     Note: I may be missing some items (work in progress :))
 
     """
-    gridlinewidth = 0.5
+    gridlinewidth = 0.1
     plotlinewidth = 1
+    ticksfontsize = 20
+    axesfontsize = 22
 
     @staticmethod
     def plotSingleBus(x, y, showplot=False, *args):
-        plt.plot(x, y, color='dodgerblue')
+        plt.plot(x, y)
         plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
         if showplot is False:
             return
@@ -48,11 +50,13 @@ class LVNetworkPlotter(object):
                 y[:, i],
                 label=r'$V_{bus_%i}$' % (i)
             )
-        plt.xlabel("Time (s)", fontsize=22, style='italic')
-        plt.ylabel('Voltage (p.u.)', fontsize=22, style='italic')
+        plt.xlabel("Time (s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.ylabel('Voltage (p.u.)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         for arg in args:
             plt.gca().add_patch(arg)
         plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
+        plt.xticks(np.arange(0, 5, step=0.05), fontsize=22)
+        plt.yticks(np.arange(0.9, 1.1, step=0.005), fontsize=22)
         plt.legend()
         if showplot is False:
             return
@@ -64,11 +68,11 @@ class LVNetworkPlotter(object):
         for i in range(0, y.shape[1]):
             plt.plot(
                 x[0:],  # The [1] needs to be adjusted (this is because initial state)
-                y[:, i] - refbus[:],
+                np.sin(y[:, i] - refbus[:]),
                 label=r'$\theta_{ref} - \theta_%i$' % (i)
             )
-        plt.xlabel("Time(s)", fontsize=22, style='italic')
-        plt.ylabel('Phase Error(radians)', fontsize=22, style='italic')
+        plt.xlabel("Time(s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.ylabel('Phase Error(radians)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
         plt.legend()
         if showplot is False:
@@ -84,8 +88,8 @@ class LVNetworkPlotter(object):
                 y[:, i],
                 label=r'$f_%i$' % (i)
             )
-        plt.xlabel("Time(s)", fontsize=22, style='italic')
-        plt.ylabel('Frequency(radians/s)', fontsize=22, style='italic')
+        plt.xlabel("Time(s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.ylabel('Frequency(radians/s)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         for arg in args:
             plt.gca().add_patch(arg)
         plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
@@ -102,8 +106,40 @@ class LVNetworkPlotter(object):
                 y[:, i],
                 label=r'$\theta_%i$' % (i)
             )
-        plt.xlabel("Time(s)", fontsize=22, style='italic')
-        plt.ylabel('Phase(radians)', fontsize=22, style='italic')
+        plt.xlabel("Time(s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.ylabel('Phase(radians)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
+        plt.legend()
+        if showplot is False:
+            return
+        else:
+            return plt.show()
+    @staticmethod
+    def plotMultiBusActivePower(x, y, showplot=False, *args):
+        for i in range(0, y.shape[1]):
+            plt.plot(
+                x[1:],
+                y[:, i],
+                label=r'$P_%i$' % (i)
+            )
+        plt.xlabel("Time(s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.ylabel('Active Power (p.u.)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
+        plt.legend()
+        if showplot is False:
+            return
+        else:
+            return plt.show()
+    @staticmethod
+    def plotMultiBusReactivePower(x, y, showplot=False, *args):
+        for i in range(0, y.shape[1]):
+            plt.plot(
+                x[1:],
+                y[:, i],
+                label=r'$Q_%i$' % (i)
+            )
+        plt.xlabel("Time(s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.ylabel('Reactive Power (p.u.)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
         plt.legend()
         if showplot is False:

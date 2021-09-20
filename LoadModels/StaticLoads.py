@@ -73,7 +73,7 @@ class FreqDependentLoad:
         # Instantiate Base Load Models into frequency dependence
         self.__kpf = kpf
         self.__kqf = kqf
-        self.__f0 = f0
+        self.__f0 = (f0/(2*np.pi))
 
         # Aggregate Base Load Models into frequency dependence
         self.BaseLoad = baseload
@@ -82,8 +82,10 @@ class FreqDependentLoad:
 
     def getLoadPower(self, V, f, ts):
         SL = self.BaseLoad.getLoadPower(V, f, ts)
-        PL = SL[0] * (1 + self.__kpf * ((f - self.__f0) / self.__f0))
-        QL = SL[1] * (1 + self.__kpf * ((f - self.__f0) / self.__f0))
+        # PL = SL[0] * (1 + self.__kpf * ((f - self.__f0) / self.__f0))
+        # QL = SL[1] * (1 + self.__kpf * ((f - self.__f0) /
+        PL = SL[0] * (1 + self.__kpf * ((f/(2*np.pi)) - self.__f0)) # According to the IEEE Load papers
+        QL = SL[1] * (1 + self.__kpf * ((f/(2*np.pi)) - self.__f0))
         return PL, QL
 
     def Freq_Dependence(self, f):

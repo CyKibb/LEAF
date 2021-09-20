@@ -20,11 +20,11 @@ def simLVN_EXPLoadsCase1(ts):
         LoadStep
     )
     # Display Results
-    plotter.plotNetworkFrequency(ts, np.array(frequency))
-    plotter.plotNetworkVoltages(ts, np.array(results[:, 4:8]))
-    plotter.plotNetworkPhase(ts, np.sin(np.array(results[:, 0:3])))
-    plotter.plotNetworkPhase(ts, np.array(results[:, 0:4]))
-    plotter.plotMultiBusPhaseError(ts, np.array(results[:, 0:4]), np.array(results[:, 0]))
+    plotter.plotNetworkFrequency(ts, np.array(frequency), True)
+    plotter.plotNetworkVoltages(ts, np.array(results[:, 4:8]), True)
+    plotter.plotNetworkPhase(ts, np.sin(np.array(results[:, 0:3])), True)
+    plotter.plotNetworkPhase(ts, np.array(results[:, 0:4]), True)
+    plotter.plotMultiBusPhaseError(ts, np.array(results[:, 0:4]), np.array(results[:, 0]), True)
     pass
 
 

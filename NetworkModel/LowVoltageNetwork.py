@@ -129,8 +129,8 @@ class LowVoltageNetwork:
                 [State[index] for index in BusIndex],
                 t,
                 self.__Pnwk[i][0] + busloadpowers[i][0],
-                self.__Qnwk[i][0] + busloadpowers[i][1]
-            )  # GenerationNextState
+                self.__Qnwk[i][0] - busloadpowers[i][1]
+            )  # GenerationNextState (I have modified the sign of reactive - busloadpowers and results seem normal)
             dEdt.append(GenerationNextState[0])
             dThetadt.append(GenerationNextState[1])
         return dThetadt + dEdt
@@ -138,6 +138,7 @@ class LowVoltageNetwork:
     def __NetworkIntegrator(self, t, initialStates, f, t_int, busloads):
         return odeint(self.getNextStateWrapper, initialStates, t, args=(f, t_int, busloads))
 
+    # TODO: THETA IS GOING TO BE NEEDED TO PASSED INTO ALL LOAD FUNCTIONS 0.0
     """ NOTE: 
         -   State layout [theta: 0 -> nodes_nums, Voltage: node_nums -> 2*node_nums] 
         -   tload: is the timing for the disturbance function to begin execution
@@ -145,7 +146,7 @@ class LowVoltageNetwork:
         -   Looping Optimization on ODEint may need to be addressed?? for faster run time?
         -   To optimize for simulation time we need to switch loops to build in operations or numpy functions
     """
-    def SimulateNetwork(self, ts, initialstates, init_frequency, tload=None, loadfunc=None, returnloads=False):
+    def SimulateNetwork(self, ts, initialstates, init_frequency, bus=None, tload=None, loadfunc=None, returnloads=False):
         # Append Initial States to Final System Response
         response = [initialstates]
         frequency = [np.array(init_frequency)]
@@ -171,7 +172,7 @@ class LowVoltageNetwork:
             if tload is None:
                 pass
             elif t[0] >= tload and loadfunc is not None:
-                loadfunc(self, t)
+                loadfunc(self, t, bus)
             # Integrate Network States
             states = self.__NetworkIntegrator(t, initialstates, frequency[i], t, busloadpowers)
             # Calculate Generator Frequency

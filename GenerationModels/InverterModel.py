@@ -2,6 +2,11 @@ import numpy as np
 
 
 # Might need to inherent from IEEE15472018 class to determine it's properties
+from scipy.integrate import odeint
+
+from NetworkPlotter.PowerNetworkPlotter import LVNetworkPlotter
+
+
 class SinglePhaseInverter:
     """ --------------------
     docstring for Single-Phase inverter generation source model
@@ -19,7 +24,8 @@ class SinglePhaseInverter:
     -------------------------"""
 
     # SPInverter Constructor
-    def __init__(self, ni, mi, Ke, tao, Prated, wn, Ei, init_Phase, E0, f0):
+    def __init__(self, ID, ni, mi, Ke, tao, Prated, wn, Ei, init_Phase, E0, f0,):
+        self.InvID = ID
         # Droop Gain Set points
         self._ni = ni  # Rad/s/VAR
         self._mi = mi  # V/Watt
@@ -33,10 +39,10 @@ class SinglePhaseInverter:
         self.tao = tao
 
         # Inverter rated power
-        self.Pi = Prated  # Rated active power injection
+        self.Prated = Prated  # Rated active power injection
         self.Pnom = 0.8 * Prated  # Nominal active power injection set point
-        self.Qimax = Prated * -0.44  # Max Reactive power injection
-        self.Qimin = Prated * 0.44  # Max Reactive power absorption
+        self.QimaxInj = Prated * -0.44  # Max Reactive power injection
+        self.QimaxAbs = Prated * 0.44  # Max Reactive power absorption
 
         # Initial States
         self.InitPhase = init_Phase
@@ -65,7 +71,8 @@ class SinglePhaseInverter:
     have a column Id to specify which column vector within the system matrix is 
     assigned to it?? 
     '''
-
+# todo: add in multiple slope functionality for droop curve
+# Todo: Handle the disconnect cases when P,Qout his P,Qmax & min limits...
     def getNextState(self, x, t, Pout, Qout):
         dEdt = (self.Ke) * (self.Ei - x[1]) - self._mi * (Pout - self.Pnom)  # Pi and Pnom might need to be switched...
         dthetadt = self.wn + self._ni * Qout
@@ -74,4 +81,118 @@ class SinglePhaseInverter:
     def getNextStateWrapper(self):
         return lambda x, t, Pout, Qout: self.getNextState(x, t, Pout, Qout)
 
-        # Single-Phase Inverter Method Check Against droop requirements are needed
+
+class SPInverterPieceWise(SinglePhaseInverter):
+
+    def __init__(self, ID, ni, mi, Ke, tao, Prated, wn, Ei, init_Phase, E0, f0):
+        if not isinstance(ni, tuple):
+            raise TypeError("ni is a mandatory tuple object, please address...")
+        if not isinstance(mi, tuple):
+            raise TypeError("mi is a mandatory tuple object, please address...")
+        super().__init__(ID, ni, mi, Ke, tao, Prated, wn, Ei, init_Phase, E0, f0)
+
+    def getNextState(self, x, t, Pout, Qout, ):
+        # TODO: Add in the disconnect conditions in the extremities
+        # Piece-Wise Linear Droop Curve V-W Curve
+        # print("Pout",Pout)
+        # print("Qout", Qout)
+        dEdt = (self.Ke) * (self.Ei - x[1]) - self._mi[0] * (Pout - self.Pnom)  # Pi and Pnom might need to be switched...
+        dthetadt = self.wn + self._ni[0] * Qout
+        if Pout > self.Prated:
+            self.Ei = 0.0# Need to double check this information
+            # print('Pout >= self.Prated')
+            # print("This is Pout",Pout, "THis is my ID", self.InvID, "This is my rating", self.Prated)
+        elif Pout < self.Pnom:
+            dEdt = (self.Ke) * (self.Ei - x[1]) - self._mi[0] * (
+                    Pout - self.Pnom)  # Need to double check this information
+            # print('Pout < self.Pnom')
+            # print("This is Pout", Pout, "THis is my ID", self.InvID, "This is my rating", self.Prated)
+        elif self.Pnom <= Pout <= self.Prated:
+            dEdt = (self.Ke) * (self.Ei - x[1]) - self._mi[1] * (
+                    Pout - self.Pnom)  # Need to double check this information
+            # print('Pout >= self.Pnom and Pout <= self.Prated')
+            # print("This is Pout", Pout, "THis is my ID", self.InvID, "This is my rating", self.Prated)
+        elif 0.95 <= Pout <= 1.05:
+            dEdt = (self.Ke) * (self.Ei - x[1]) - self._mi[0] * (self.Pnom)  # Need to double check this information
+            # print('Pout >= 0.95 and Pout <= 1.05:')
+            # print("This is Pout", Pout, "THis is my ID", self.InvID, "This is my rating", self.Prated)
+
+        # Piece-Wise Linear Droop Curve f-VAR Curve
+        if 0 > Qout >= self.QimaxInj:
+            dthetadt = self.wn + self._ni[0] * Qout
+            # print('Qout < 0 and Qout >= self.QimaxInj:')
+            # print("This is Qout:", Qout, "THis is my ID:", self.InvID, "This is my rating:", self.QimaxInj)
+        elif Qout == 0:
+            dthetadt = self.wn
+            # print('Qout == 0:')
+            # print("This is Qout:", Qout, "THis is my ID:", self.InvID, "This is my rating:", self.QimaxInj)
+        elif 0 < Qout <= self.QimaxAbs:
+            dthetadt = self.wn  + self._ni[1] * Qout
+            # print('Qout > 0 and Qout <= self.QimaxAbs:')
+            # print("This is Qout:", Qout, "THis is my ID:", self.InvID, "This is my rating:", self.QimaxAbs)
+        elif Qout < self.QimaxInj:
+            self.wn = 0.0
+            self.Ei = 0.0
+            # print('Qout <= self.QimaxInj:')
+            # print("This is Qout:", Qout, "THis is my ID:", self.InvID, "This is my rating:", self.QimaxInj)
+        elif Qout > self.QimaxAbs:
+            self.wn = 0.0
+            self.Ei = 0.0
+            # print('Qout >= self.QimaxAbs:')
+            # print("This is Qout:", Qout, "THis is my ID:", self.InvID, "This is my rating:", self.QimaxAbs)
+
+        return self.tao * dEdt, dthetadt
+
+
+def unittest():
+    # Define Number of Sample Pointer required
+    N = 100000
+    # Simulation Total Time (s)
+    T_tot = 4
+    # Define Time Row Vector to Use
+    ts = np.linspace(0.0, T_tot, N)
+    # Define Unit Test Voltage Step
+    Vbus = np.ones(N)
+    # Create Unit Step Voltage Disturbance
+    Vbus[int(N / 2):] *= 0.8
+    # Define Pout
+    Pout = np.ones(N)
+    Qout = np.ones(N)
+    Pout *= 0.5
+    Qout *= 0.01
+    print("Pout and Qout", Pout, Qout)
+    # Define ERL Load Under Test
+    inverter_test = SinglePhaseInverter(
+        ID=1,
+        ni=62.5,
+        mi=2.143,
+        Ke=1.0,
+        tao=10.0,
+        Prated=0.5,
+        wn=377,
+        Ei=0,
+        init_Phase=0.6,
+        E0=1.0,
+        f0=377
+    )
+    # Loop through and test ERL state solver
+    print("getInitStates test:", inverter_test.getInitStates()[:2])
+    x = []
+    PL = []
+    x.append(inverter_test.getInitStates()[:2])
+    x0 = inverter_test.getInitStates()[:2]
+
+    # Loop through to calculate next states...
+    for i in range(len(ts) - 1):
+        t = [ts[i], ts[i + 1]]
+        xode = odeint(inverter_test.getNextStateWrapper(), x0, t, args=(Pout[i], Qout[i]))
+        xode[1, 0] = xode[1,0] % (2 * np.pi)
+        x.append(xode[1])
+        x0 = xode[1]
+    x = np.array(x)
+    # Next State and Load Power Vectors
+    LVNetworkPlotter.plotSingleBus(ts, x[:,0], showplot=True)
+    LVNetworkPlotter.plotSingleBus(ts, x[:,1], showplot=True)
+
+if __name__ == '__main__':
+    unittest()

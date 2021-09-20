@@ -1,25 +1,22 @@
 # Internal Imports
-from NetworkTestCases.Synchronization.SyncCase1 import *
-from NetworkTestCases.StaticLoads.ZIPLoadTests.ZIPLoadCase1 import *
-from NetworkTestCases.StaticLoads.ZIPLoadTests.ZIPLoadCase2 import *
-from NetworkTestCases.StaticLoads.ExponentialLoadsTests.EXPLoadCase1 import *
-from NetworkTestCases.StaticLoads.FreqDependentLoadsTests.FreqLoadCase1 import *
-from NetworkTestCases.StaticLoads.EPRILoadsTests.EPRILoadCase1 import *
-from NetworkTestCases.DynamicLoads.ERLLoadCase1 import *
+from ThesisSimulations.LoadStepCase1.Simulation import SimulateLVN_Case1
 
 # External Imports
 import numpy as np
-
 
 '''Main is used to run the desired test Modules as pleased....'''
 
 if __name__ == '__main__':
     print("Running Main Simulation Script")
-    # Define Number of Sample Pointer required
-    N = 1000
-    # # Simulation Total Time (s)
-    T_tot = 5
-    # Run Network Unit Test
+    # Run Network Dynamic Simulation Case 1
+    SimulateLVN_Case1(5)
+    # # Run Network Unit Test
+    # simLVN_ThesisCase1(
+    #     np.linspace(0.1, T_tot, N)
+    # )
+    # simLVN_ThesisCase2(
+    #     np.linspace(0.1, T_tot, N)
+    # )
     # simLVN_Synchronization(
     #     np.linspace(0.0, T_tot, N)
     # )
@@ -38,9 +35,9 @@ if __name__ == '__main__':
     # simLVN_EPRILoadsCase1(
     #     np.linspace(0.0, T_tot, N)
     # )
-    simLVN_ERLLoadsCase1(
-        np.linspace(0.0, T_tot, N),
-        T_tot
-    )
+    # simLVN_ERLLoadsCase1(
+    #     np.linspace(0.0, T_tot, N),
+    #     T_tot
+    # )
     print("I am done... Happy Analyzing :)")
     pass

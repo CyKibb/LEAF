@@ -151,6 +151,7 @@ class LowVoltageNetwork:
         response = [initialstates]
         frequency = [np.array(init_frequency)]
         nwkloading = []
+        simbreakpoint = len(ts)
         # Integrate Network Dynamics Across Each Time Step ts
         for i in range(len(ts) - 1):
             # Time step for integrator
@@ -175,6 +176,11 @@ class LowVoltageNetwork:
                 loadfunc(self, t, bus)
             # Integrate Network States
             states = self.__NetworkIntegrator(t, initialstates, frequency[i], t, busloadpowers)
+            if any(True for state in states[1] if state < 0):
+                print("OUCH I GOT SHOCKED @ ts =", ts[i])
+                print("NETWORK FAILED :-(")
+                simbreakpoint = i + 1
+                break
             # Calculate Generator Frequency
             frequency.append(
                 ((states[1, 0:self.NodeNums] - states[0, 0:self.NodeNums]) / (ts[i + 1] - ts[i]))
@@ -186,9 +192,9 @@ class LowVoltageNetwork:
             # Append simulation results list
             response.append(states[1].tolist())
         if returnloads is True:
-            return np.array(response), np.array(frequency), np.array(nwkloading)
+            return np.array(response), np.array(frequency), np.array(nwkloading), simbreakpoint
         else:
-            return np.array(response), np.array(frequency)
+            return np.array(response), np.array(frequency), simbreakpoint
 
 
 if __name__ == '__main__':

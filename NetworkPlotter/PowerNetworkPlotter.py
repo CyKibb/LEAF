@@ -50,13 +50,14 @@ class LVNetworkPlotter(object):
                 y[:, i],
                 label=r'$V_{bus_%i}$' % (i)
             )
+        plt.title("Network Bus Voltages Vs. Time", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.xlabel("Time (s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.ylabel('Voltage (p.u.)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         for arg in args:
             plt.gca().add_patch(arg)
         plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
-        plt.xticks(np.arange(0, 5, step=0.05), fontsize=22)
-        plt.yticks(np.arange(0.9, 1.1, step=0.005), fontsize=22)
+        # plt.xticks(np.arange(0, 5, step=0.05), fontsize=22)
+        # plt.yticks(np.arange(0.9, 1.1, step=0.005), fontsize=22)
         plt.legend()
         if showplot is False:
             return
@@ -71,6 +72,7 @@ class LVNetworkPlotter(object):
                 np.sin(y[:, i] - refbus[:]),
                 label=r'$\theta_{ref} - \theta_%i$' % (i)
             )
+        plt.title("Network Bus Phases (w.r.t Bus 0) Vs. Time", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.xlabel("Time(s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.ylabel('Phase Error(radians)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
@@ -88,6 +90,7 @@ class LVNetworkPlotter(object):
                 y[:, i],
                 label=r'$f_%i$' % (i)
             )
+        plt.title("Network Bus Frequency Vs. Time", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.xlabel("Time(s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.ylabel('Frequency(radians/s)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         for arg in args:
@@ -106,6 +109,7 @@ class LVNetworkPlotter(object):
                 y[:, i],
                 label=r'$\theta_%i$' % (i)
             )
+        plt.title("Network Bus Phase", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.xlabel("Time(s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.ylabel('Phase(radians)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
@@ -122,6 +126,7 @@ class LVNetworkPlotter(object):
                 y[:, i],
                 label=r'$P_%i$' % (i)
             )
+        plt.title("Network Bus Active Power Vs. Time", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.xlabel("Time(s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.ylabel('Active Power (p.u.)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
@@ -138,6 +143,7 @@ class LVNetworkPlotter(object):
                 y[:, i],
                 label=r'$Q_%i$' % (i)
             )
+        plt.title("Network Bus Reactive Power Vs. Time", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.xlabel("Time(s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.ylabel('Reactive Power (p.u.)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)

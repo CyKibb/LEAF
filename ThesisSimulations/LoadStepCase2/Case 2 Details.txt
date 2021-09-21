@@ -1,0 +1,14 @@
+Case 1:
+
+The loads on the networks are static loads based on the exponential frequency-dependent load model.
+
+The simulation starts with a loading that is well within the operational range of each DG. At t=2.0s we disturb the
+network with a sequence of load steps off set by 0.2s intervals....
+
+Loads in this case are similar to that of Case1 except with the sequence steps
+
+Following are the load parameters:
+
+
+Following are the inverter parameters:
+

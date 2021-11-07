@@ -45,6 +45,8 @@ class LowVoltageNetwork:
         self.__Pnwk = np.zeros((NodeNums, 1))  # Qnetwork Exported to other nodes vector representation
         self.__Qnwk = np.zeros((NodeNums, 1))  # Qnetwork Exported to other nodes vector representation
         print("Low Voltage Network Created!")
+        self.GeneratorActivePowerOutput = []
+        self.GeneratorReactivePowerOutput = []
 
     """ User Must Pass In the Desired Coupling Impedances Between Busses """
 
@@ -86,7 +88,7 @@ class LowVoltageNetwork:
             np.multiply(
                 self.__Kappa,
                 np.cos(self.__Phi)
-            ),  # The question here is if the transpose is happening first?
+            ),
             E
         )
         self.__Qnwk = np.matmul(
@@ -133,6 +135,14 @@ class LowVoltageNetwork:
             )  # GenerationNextState (I have modified the sign of reactive - busloadpowers and results seem normal)
             dEdt.append(GenerationNextState[0])
             dThetadt.append(GenerationNextState[1])
+
+            self.GeneratorActivePowerOutput.append(
+                (self.__Pnwk + (np.array(busloadpowers)[:, 0].reshape(self.NodeNums, 1))).tolist()
+            )
+            self.GeneratorReactivePowerOutput.append(
+                (self.__Qnwk + (np.array(busloadpowers)[:, 1].reshape(self.NodeNums, 1))).tolist()
+            )
+
         return dThetadt + dEdt
 
     def __NetworkIntegrator(self, t, initialStates, f, t_int, busloads):

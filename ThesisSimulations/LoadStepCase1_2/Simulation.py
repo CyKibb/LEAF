@@ -11,7 +11,7 @@ import numpy as np
 # Define Simulation to be Executed in Main...
 def SimulateLVN_Case1_2(t_sim):
     # Define Time Array for Simulation
-    ts = np.linspace(0, t_sim, 1000000)
+    ts = np.linspace(0, t_sim, 100000)
     # Define Bus Array & Build Bus Objects
     bus = [Bus0(), Bus1(), Bus2(), Bus3()]
     # Define Network Connections & Coupling Between Buses
@@ -48,8 +48,12 @@ def SimulateLVN_Case1_2(t_sim):
         LoadStep2,
         returnloads=True
     )
-    # Display Results...
     PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint)
+    PlotBusPowerResponse(
+        np.linspace(0, t_sim, np.array(network.GeneratorActivePowerOutput).shape[0] + 1),
+        np.squeeze(np.array(network.GeneratorActivePowerOutput), axis=2),
+        np.squeeze(np.array(network.GeneratorReactivePowerOutput), axis=2)
+    )
     return
 
 
@@ -110,5 +114,14 @@ def PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint):
     plotter.plotNetworkVoltages(ts[:simbreakpoint], np.array(results[:, 4:8]), showplot=True)
     plotter.plotNetworkPhase(ts[:simbreakpoint], np.sin(np.array(results[:, 0:3])), showplot=True)
     plotter.plotNetworkPhase(ts[:simbreakpoint], np.array(results[:, 0:4]), showplot=True)
+
+    return
+
+
+def PlotBusPowerResponse(ts, busActivePower, busReactivePower):
+    plotter = Ieee1547Plotter
+
+    plotter.plotMultiBusActivePower(ts, busActivePower, showplot=True)
+    plotter.plotMultiBusReactivePower(ts, busReactivePower, showplot=True)
 
     return

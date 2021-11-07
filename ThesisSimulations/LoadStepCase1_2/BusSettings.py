@@ -42,8 +42,8 @@ class Bus0:
             -2.3,
             377,
             ExponentialLoad(
-                P0=0.14,
-                Q0=0.0136,
+                P0=0.12,
+                Q0=0.015,
                 V0=1.0,
                 np=1.2,
                 nq=2.7
@@ -85,7 +85,7 @@ class Bus1:
             377,
             ExponentialLoad(
                 P0=0.12,
-                Q0=0.0254,
+                Q0=0.03,
                 V0=1.0,
                 np=1.2,
                 nq=2.7
@@ -127,7 +127,7 @@ class Bus2:
             377,
             ExponentialLoad(
                 P0=0.15,
-                Q0=0.0136,
+                Q0=0.02,
                 V0=1.0,
                 np=1.2,
                 nq=2.7
@@ -169,7 +169,7 @@ class Bus3:
             377,
             ExponentialLoad(
                 P0=0.105,
-                Q0=0.0372,
+                Q0=0.0272,
                 V0=1.0,
                 np=1.2,
                 nq=2.7

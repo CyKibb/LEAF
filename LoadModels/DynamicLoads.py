@@ -4,7 +4,6 @@ import numpy as np
 from NetworkPlotter.PowerNetworkPlotter import *
 
 
-# TODO: This class should be able to take what type of load model you would like to add to it.
 class ExponentialRecoveryLoad:
     """ --------------------
     docstring for ERL dynamic load Model

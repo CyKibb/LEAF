@@ -138,7 +138,6 @@ class LowVoltageNetwork:
     def __NetworkIntegrator(self, t, initialStates, f, t_int, busloads):
         return odeint(self.getNextStateWrapper, initialStates, t, args=(f, t_int, busloads))
 
-    # TODO: THETA IS GOING TO BE NEEDED TO PASSED INTO ALL LOAD FUNCTIONS 0.0
     """ NOTE: 
         -   State layout [theta: 0 -> nodes_nums, Voltage: node_nums -> 2*node_nums] 
         -   tload: is the timing for the disturbance function to begin execution
@@ -185,6 +184,12 @@ class LowVoltageNetwork:
             frequency.append(
                 ((states[1, 0:self.NodeNums] - states[0, 0:self.NodeNums]) / (ts[i + 1] - ts[i]))
             )
+            if any(True for frequencies in frequency[i] if frequencies < 0):
+                print("OUCH I GOT SHOCKED @ ts =", ts[i])
+                print("I am in the frequency check state -<-.->-")
+                print("NETWORK FAILED :-(")
+                simbreakpoint = i + 1
+                break
             # Adjust for Phase State 2pi overflow
             states[1, 0:self.NodeNums] = states[1, 0:self.NodeNums] % (2 * np.pi)
             # Update initial states for next iteration

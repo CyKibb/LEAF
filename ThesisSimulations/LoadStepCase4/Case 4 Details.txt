@@ -1,0 +1,13 @@
+Case 4:
+
+The Initial loads on the networks are static loads based on the exponential frequency-dependent load model.
+
+We then disturb the system with a series of dynamic load steps consisting of the ERL Load
+
+Loads in this case are similar to that of Case1 except with the sequence steps
+
+Following are the load parameters:
+
+
+Following are the inverter parameters:
+

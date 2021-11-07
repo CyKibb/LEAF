@@ -165,7 +165,7 @@ class EPRILoadsyn:
         SLf2 = self.S2.getLoadPower(V, f, ts)
         PL = SLz[0] + SLi[0] + SLc[0] + SLf1[0] + SLf2[0]
         QL = SLz[1] + SLi[1] + SLc[1] + SLf1[1] + SLf2[1]
-        return (PL/(self.S0[0]*self.Sfrac[0])), (QL/(self.S0[1]*self.Sfrac[1]))
+        return (PL*(self.S0[0]*self.Sfrac[0])), (QL*(self.S0[1]*self.Sfrac[1]))
 
 
 """TODO: Add in a NULL Load bus """

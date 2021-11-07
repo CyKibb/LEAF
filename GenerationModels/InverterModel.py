@@ -71,10 +71,11 @@ class SinglePhaseInverter:
     have a column Id to specify which column vector within the system matrix is 
     assigned to it?? 
     '''
-# todo: add in multiple slope functionality for droop curve
-# Todo: Handle the disconnect cases when P,Qout his P,Qmax & min limits...
+#     TODO: Need to figure out how to limit power injection capabilities
+# Todo: Handle the disconnect cases when P,Qout hits P,Qmax & min limits...
     def getNextState(self, x, t, Pout, Qout):
-        dEdt = (self.Ke) * (self.Ei - x[1]) - self._mi * (Pout - self.Pnom)  # Pi and Pnom might need to be switched...
+        #TODO: Evaluation of Pout + self.Pnom
+        dEdt = (self.Ke) * (self.Ei - x[1]) - self._mi * (Pout + self.Pnom)  # Pi and Pnom might need to be switched...
         dthetadt = self.wn + self._ni * Qout
         return self.tao * dEdt, dthetadt
 
@@ -82,9 +83,11 @@ class SinglePhaseInverter:
         return lambda x, t, Pout, Qout: self.getNextState(x, t, Pout, Qout)
 
 
+
 class SPInverterPieceWise(SinglePhaseInverter):
 
     def __init__(self, ID, ni, mi, Ke, tao, Prated, wn, Ei, init_Phase, E0, f0):
+        # Check to ensure that we have received the correct inputs
         if not isinstance(ni, tuple):
             raise TypeError("ni is a mandatory tuple object, please address...")
         if not isinstance(mi, tuple):
@@ -98,24 +101,27 @@ class SPInverterPieceWise(SinglePhaseInverter):
         # print("Qout", Qout)
         dEdt = (self.Ke) * (self.Ei - x[1]) - self._mi[0] * (Pout - self.Pnom)  # Pi and Pnom might need to be switched...
         dthetadt = self.wn + self._ni[0] * Qout
+
         if Pout > self.Prated:
-            self.Ei = 0.0# Need to double check this information
+            dEdt = 0
             # print('Pout >= self.Prated')
             # print("This is Pout",Pout, "THis is my ID", self.InvID, "This is my rating", self.Prated)
         elif Pout < self.Pnom:
             dEdt = (self.Ke) * (self.Ei - x[1]) - self._mi[0] * (
-                    Pout - self.Pnom)  # Need to double check this information
+                    Pout + self.Pnom)  # Need to double check this information
             # print('Pout < self.Pnom')
             # print("This is Pout", Pout, "THis is my ID", self.InvID, "This is my rating", self.Prated)
         elif self.Pnom <= Pout <= self.Prated:
             dEdt = (self.Ke) * (self.Ei - x[1]) - self._mi[1] * (
-                    Pout - self.Pnom)  # Need to double check this information
+                    Pout + self.Pnom)  # Need to double check this information
             # print('Pout >= self.Pnom and Pout <= self.Prated')
             # print("This is Pout", Pout, "THis is my ID", self.InvID, "This is my rating", self.Prated)
         elif 0.95 <= Pout <= 1.05:
             dEdt = (self.Ke) * (self.Ei - x[1]) - self._mi[0] * (self.Pnom)  # Need to double check this information
             # print('Pout >= 0.95 and Pout <= 1.05:')
             # print("This is Pout", Pout, "THis is my ID", self.InvID, "This is my rating", self.Prated)
+        else:
+            dEdt = (self.Ke) * (self.Ei - x[1]) - self._mi * (Pout + self.Pnom)
 
         # Piece-Wise Linear Droop Curve f-VAR Curve
         if 0 > Qout >= self.QimaxInj:
@@ -140,6 +146,8 @@ class SPInverterPieceWise(SinglePhaseInverter):
             self.Ei = 0.0
             # print('Qout >= self.QimaxAbs:')
             # print("This is Qout:", Qout, "THis is my ID:", self.InvID, "This is my rating:", self.QimaxAbs)
+        else:
+            dthetadt = self.wn + self._ni * Qout
 
         return self.tao * dEdt, dthetadt
 

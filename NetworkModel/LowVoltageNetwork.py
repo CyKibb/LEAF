@@ -48,6 +48,9 @@ class LowVoltageNetwork:
         self.GeneratorActivePowerOutput = []
         self.GeneratorReactivePowerOutput = []
 
+        self.NetworkActivePower = []
+        self.NetworkReactivePower = []
+
     """ User Must Pass In the Desired Coupling Impedances Between Busses """
 
     @property
@@ -124,6 +127,9 @@ class LowVoltageNetwork:
         # Prepare Next States Row Vectors
         dEdt = []
         dThetadt = []
+
+        # print("self.Pnwk",self.__Pnwk, "at time t=", t)
+
         # Calculate Next States for Each Node in Network
         for i in range(0, self.NodeNums):
             BusIndex = [i, i + self.NodeNums]
@@ -136,12 +142,16 @@ class LowVoltageNetwork:
             dEdt.append(GenerationNextState[0])
             dThetadt.append(GenerationNextState[1])
 
+            # TODO: There is an issue when it comes to the transfer of power between buses...
             self.GeneratorActivePowerOutput.append(
                 (self.__Pnwk + (np.array(busloadpowers)[:, 0].reshape(self.NodeNums, 1))).tolist()
             )
             self.GeneratorReactivePowerOutput.append(
-                (self.__Qnwk + (np.array(busloadpowers)[:, 1].reshape(self.NodeNums, 1))).tolist()
+                (self.__Qnwk - (np.array(busloadpowers)[:, 1].reshape(self.NodeNums, 1))).tolist()
             )
+
+            self.NetworkActivePower.append(self.__Pnwk.tolist())
+            self.NetworkReactivePower.append(self.__Qnwk.tolist())
 
         return dThetadt + dEdt
 

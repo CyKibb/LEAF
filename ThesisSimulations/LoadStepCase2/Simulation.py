@@ -51,6 +51,11 @@ def SimulateLVN_Case2(t_sim):
     print("this was the sim breakpoint", simbreakpoint)
     # Display Results...
     PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint)
+    PlotBusPowerResponse(
+        np.linspace(0, t_sim, np.array(network.GeneratorActivePowerOutput).shape[0] + 1),
+        np.squeeze(np.array(network.GeneratorActivePowerOutput), axis=2),
+        np.squeeze(np.array(network.GeneratorReactivePowerOutput), axis=2)
+    )
     return
 
 
@@ -80,15 +85,25 @@ def PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint):
     plotter = Ieee1547Plotter
     # Display Results
     plotter.plotNetworkFrequency(ts[:simbreakpoint], np.array(frequency), showplot=True)
-    plotter.plotMultiBusActivePower(ts[:simbreakpoint+1], loads[:, :, 0], showplot=True)
-    plotter.plotMultiBusReactivePower(ts[:simbreakpoint+1], loads[:, :, 1], showplot=True)
-    plotter.plotMultiBusPhaseError(ts[:simbreakpoint], np.array(results[:, 0:4]), np.array(results[:, 0]), showplot=True)
+    plotter.plotMultiBusActivePower(ts[:simbreakpoint + 1], loads[:, :, 0], showplot=True)
+    plotter.plotMultiBusReactivePower(ts[:simbreakpoint + 1], loads[:, :, 1], showplot=True)
+    plotter.plotMultiBusPhaseError(ts[:simbreakpoint], np.array(results[:, 0:4]), np.array(results[:, 0]),
+                                   showplot=True)
     plotter.plotNetworkVoltages(ts[:simbreakpoint], np.array(results[:, 4:8]), showplot=True)
     plotter.plotNetworkPhase(ts[:simbreakpoint], np.sin(np.array(results[:, 0:3])), showplot=True)
     plotter.plotNetworkPhase(ts[:simbreakpoint], np.array(results[:, 0:4]), showplot=True)
 
     # Plot Results Based on IEEE1547 Req's
-    plotter.plotCatfreq_ridethrough(ts[:simbreakpoint], (np.array(frequency)/(2*np.pi)), t_sim)
+    plotter.plotCatfreq_ridethrough(ts[:simbreakpoint], (np.array(frequency) / (2 * np.pi)), t_sim)
     plotter.plotCatIII_voltage(ts[:simbreakpoint], np.array(results[:, 4:8]), t_sim)
+
+    return
+
+
+def PlotBusPowerResponse(ts, busActivePower, busReactivePower):
+    plotter = Ieee1547Plotter
+
+    plotter.plotMultiBusActivePower(ts, busActivePower, showplot=True)
+    plotter.plotMultiBusReactivePower(ts, busReactivePower, showplot=True)
 
     return

@@ -1,7 +1,8 @@
 import numpy as np
 
 from GenerationModels.InverterModel import SinglePhaseInverter, SPInverterPieceWise
-from LoadModels.StaticLoads import ZIPpolynomialLoad, FreqDependentLoad, ExponentialLoad
+from LoadModels.DynamicLoads import ExponentialRecoveryLoad
+from LoadModels.StaticLoads import ZIPpolynomialLoad, FreqDependentLoad, ExponentialLoad, EPRILoadsyn
 
 '''
     This file defines the loads and generation on each bus with its own class. 
@@ -25,29 +26,27 @@ class Bus0:
             E0=1.0,
             f0=377
         )
-        self.initLoad = FreqDependentLoad(
-            0.7,
-            -2.3,
-            377,
-            ExponentialLoad(
-                P0=0.05,
-                Q0=0.0136,
+        self.initLoad = EPRILoadsyn(
                 V0=1.0,
-                np=1.2,
-                nq=2.7
+                f0=377,
+                S0=(0.05, 0.0136),
+                Sfrac=(1.0, 1.0),
+                Ki=(0, 0),
+                Kc=(0, 0),
+                K1=(0.2, 0.4845),
+                K2=(0.5, 0.672),
+                kf1=(1.0, -2.8),
+                kf2=(1.9, 1.2),
+                nv1=(1.0, 3.0),
+                nv2=(0.1, 0.5)
             )
-        )
-        self.loadStep = FreqDependentLoad(
-            0.7,
-            -2.3,
-            377,
-            ExponentialLoad(
-                P0=0.12,
-                Q0=0.015,
-                V0=1.0,
-                np=1.2,
-                nq=2.7
-            )
+        self.loadStep = ExponentialRecoveryLoad(
+            T=(127.6, 75.3),
+            init_x=[0.08, 0.02],
+            S0=(0.08, 0.02),
+            V0=(1.0),
+            alphaT=(2.26, 5.22),
+            alphaS=(0.38, 2.68)
         )
 
 
@@ -67,29 +66,27 @@ class Bus1:
             E0=1.0,
             f0=377
         )
-        self.initLoad = FreqDependentLoad(
-            0.7,
-            -2.3,
-            377,
-            ExponentialLoad(
-                P0=0.1,
-                Q0=0.0254,
+        self.initLoad = EPRILoadsyn(
                 V0=1.0,
-                np=1.2,
-                nq=2.7
+                f0=377,
+                S0=(0.10, 0.0254),
+                Sfrac=(1.0, 1.0),
+                Ki=(0, 0),
+                Kc=(0, 0),
+                K1=(0.2, 0.4845),
+                K2=(0.5, 0.672),
+                kf1=(1.0, -2.8),
+                kf2=(1.9, 1.2),
+                nv1=(1.0, 3.0),
+                nv2=(0.1, 0.5)
             )
-        )
-        self.loadStep = FreqDependentLoad(
-            0.7,
-            -2.3,
-            377,
-            ExponentialLoad(
-                P0=0.12,
-                Q0=0.03,
-                V0=1.0,
-                np=1.2,
-                nq=2.7
-            )
+        self.loadStep = ExponentialRecoveryLoad(
+            T=(127.6, 75.3),
+            init_x=[0.1, 0.03],
+            S0=(0.1, 0.03),
+            V0=(1.0),
+            alphaT=(2.26, 5.22),
+            alphaS=(0.38, 2.68)
         )
 
 
@@ -109,29 +106,27 @@ class Bus2:
             E0=1.0,
             f0=377
         )
-        self.initLoad = FreqDependentLoad(
-            0.7,
-            -2.3,
-            377,
-            ExponentialLoad(
-                P0=0.05,
-                Q0=0.0136,
+        self.initLoad = EPRILoadsyn(
                 V0=1.0,
-                np=1.2,
-                nq=2.7
+                f0=377,
+                S0=(0.05, 0.0136),
+                Sfrac=(1.0, 1.0),
+                Ki=(0, 0),
+                Kc=(0, 0),
+                K1=(0.2, 0.4845),
+                K2=(0.5, 0.672),
+                kf1=(1.0, -2.8),
+                kf2=(1.9, 1.2),
+                nv1=(1.0, 3.0),
+                nv2=(0.1, 0.5)
             )
-        )
-        self.loadStep = FreqDependentLoad(
-            0.7,
-            -2.3,
-            377,
-            ExponentialLoad(
-                P0=0.15,
-                Q0=0.02,
-                V0=1.0,
-                np=1.2,
-                nq=2.7
-            )
+        self.loadStep = ExponentialRecoveryLoad(
+            T=(127.6, 75.3),
+            init_x=[0.08, 0.03],
+            S0=(0.08, 0.03),
+            V0=(1.0),
+            alphaT=(2.26, 5.22),
+            alphaS=(0.38, 2.68)
         )
 
 
@@ -151,33 +146,31 @@ class Bus3:
             E0=1.0,
             f0=377
         )
-        self.initLoad = FreqDependentLoad(
-            0.7,
-            -2.3,
-            377,
-            ExponentialLoad(
-                P0=0.1,
-                Q0=0.0372,
+        self.initLoad = EPRILoadsyn(
                 V0=1.0,
-                np=1.2,
-                nq=2.7
+                f0=377,
+                S0=(0.1, 0.0372),
+                Sfrac=(1.0, 1.0),
+                Ki=(0, 0),
+                Kc=(0, 0),
+                K1=(0.2, 0.4845),
+                K2=(0.5, 0.672),
+                kf1=(1.0, -2.8),
+                kf2=(1.9, 1.2),
+                nv1=(1.0, 3.0),
+                nv2=(0.1, 0.5)
             )
-        )
-        self.loadStep = FreqDependentLoad(
-            0.7,
-            -2.3,
-            377,
-            ExponentialLoad(
-                P0=0.105,
-                Q0=0.0272,
-                V0=1.0,
-                np=1.2,
-                nq=2.7
-            )
+        self.loadStep = ExponentialRecoveryLoad(
+            T=(127.6, 75.3),
+            init_x=[0.105, 0.0272],
+            S0=(0.105, 0.0272),
+            V0=(1.0),
+            alphaT=(2.26, 5.22),
+            alphaS=(0.38, 2.68)
         )
 
-
-class NetworkCoupling:
+# TODO: Add in inverter power limiting and disconnection cases for radial and ring connections
+class Network:
     # Define Static Loads (Shunt Admittances)
     # Y1 = np.complex(0.4, 0.44)
     # Y2 = np.complex(0.24, 0.132)
@@ -207,3 +200,6 @@ class NetworkCoupling:
              [self.yb31, self.yb32, self.yb33, self.yb34],
              [self.yb41, self.yb42, self.yb43, self.yb44]]
         )
+
+    def NetworkFault(self,):
+        return

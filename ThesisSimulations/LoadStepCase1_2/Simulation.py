@@ -11,7 +11,7 @@ import numpy as np
 # Define Simulation to be Executed in Main...
 def SimulateLVN_Case1_2(t_sim):
     # Define Time Array for Simulation
-    ts = np.linspace(0, t_sim, 100000)
+    ts = np.linspace(0, t_sim, 1000000)
     # Define Bus Array & Build Bus Objects
     bus = [Bus0(), Bus1(), Bus2(), Bus3()]
     # Define Network Connections & Coupling Between Buses
@@ -44,8 +44,8 @@ def SimulateLVN_Case1_2(t_sim):
         initialStates[0],
         initialStates[1],
         bus,
-        1.8,
-        LoadStep2,
+        1.4,
+        LoadStep,
         returnloads=True
     )
     PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint)
@@ -107,12 +107,12 @@ def PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint):
 
     # Display Detailed Results
     plotter.plotNetworkFrequency(ts[:simbreakpoint + 1], np.array(frequency), showplot=True)
-    plotter.plotMultiBusActivePower(ts[:simbreakpoint + 1], loads[:, :, 0], showplot=True)
-    plotter.plotMultiBusReactivePower(ts[:simbreakpoint + 1], loads[:, :, 1], showplot=True)
+    plotter.plotActivePowerLoading(ts[:simbreakpoint + 1], loads[:, :, 0], showplot=True)
+    plotter.plotReactivePowerLoading(ts[:simbreakpoint + 1], loads[:, :, 1], showplot=True)
     plotter.plotMultiBusPhaseError(ts[:simbreakpoint], np.array(results[:, 0:4]),
                                    np.array(results[:, 0]), showplot=True)
-    plotter.plotNetworkVoltages(ts[:simbreakpoint], np.array(results[:, 4:8]), showplot=True)
-    plotter.plotNetworkPhase(ts[:simbreakpoint], np.sin(np.array(results[:, 0:3])), showplot=True)
+    # plotter.plotNetworkVoltages(ts[:simbreakpoint], np.array(results[:, 4:8]), showplot=True)
+    # plotter.plotNetworkPhase(ts[:simbreakpoint], np.sin(np.array(results[:, 0:3])), showplot=True)
     plotter.plotNetworkPhase(ts[:simbreakpoint], np.array(results[:, 0:4]), showplot=True)
 
     return

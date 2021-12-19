@@ -103,7 +103,8 @@ class SPInverterPieceWise(SinglePhaseInverter):
         dthetadt = self.wn + self._ni[0] * Qout
 
         if Pout > self.Prated:
-            dEdt = 0
+            dEdt = (self.Ke) * (self.Ei - x[1]) - self._mi[0] * (self.Prated - self.Pnom)
+            # dEdt = 0
             # print('Pout >= self.Prated')
             # print("This is Pout",Pout, "THis is my ID", self.InvID, "This is my rating", self.Prated)
         elif Pout < self.Pnom:
@@ -137,13 +138,11 @@ class SPInverterPieceWise(SinglePhaseInverter):
             # print('Qout > 0 and Qout <= self.QimaxAbs:')
             # print("This is Qout:", Qout, "THis is my ID:", self.InvID, "This is my rating:", self.QimaxAbs)
         elif Qout < self.QimaxInj:
-            self.wn = 0.0
-            self.Ei = 0.0
+            dthetadt = self.wn  + self._ni[1] * self.QimaxInj
             # print('Qout <= self.QimaxInj:')
             # print("This is Qout:", Qout, "THis is my ID:", self.InvID, "This is my rating:", self.QimaxInj)
         elif Qout > self.QimaxAbs:
-            self.wn = 0.0
-            self.Ei = 0.0
+            dthetadt = self.wn  + self._ni[1] * self.QimaxAbs
             # print('Qout >= self.QimaxAbs:')
             # print("This is Qout:", Qout, "THis is my ID:", self.InvID, "This is my rating:", self.QimaxAbs)
         else:

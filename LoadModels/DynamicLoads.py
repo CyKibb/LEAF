@@ -60,7 +60,7 @@ class ExponentialRecoveryLoad:
         # Get transient load power
         SLexp = self.Pt.getLoadPower(V, f, ts)
         # Return Load power
-        return self.x0[0] + SLexp[0], self.x0[0] + SLexp[1]
+        return self.x0[0] + SLexp[0], self.x0[1] + SLexp[1]
 
 
 def unittest():

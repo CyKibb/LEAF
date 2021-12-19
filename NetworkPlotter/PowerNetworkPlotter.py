@@ -92,7 +92,7 @@ class LVNetworkPlotter(object):
             )
         plt.title("Network Bus Frequency Vs. Time", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         plt.xlabel("Time(s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
-        plt.ylabel('Frequency(radians/s)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.ylabel('Frequency(Hz)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
         for arg in args:
             plt.gca().add_patch(arg)
         plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
@@ -135,6 +135,25 @@ class LVNetworkPlotter(object):
             return
         else:
             return plt.show()
+
+    @staticmethod
+    def plotActivePowerLoading(x, y, showplot=False, *args):
+        for i in range(0, y.shape[1]):
+            plt.plot(
+                x[1:],
+                y[:, i],
+                label=r'$P_%i$' % (i)
+            )
+        plt.title("Network Bus Active Power Loading Vs. Time", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.xlabel("Time(s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.ylabel('Active Power (p.u.)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
+        plt.legend()
+        if showplot is False:
+            return
+        else:
+            return plt.show()
+
     @staticmethod
     def plotMultiBusReactivePower(x, y, showplot=False, *args):
         for i in range(0, y.shape[1]):
@@ -153,6 +172,23 @@ class LVNetworkPlotter(object):
         else:
             return plt.show()
 
+    @staticmethod
+    def plotReactivePowerLoading(x, y, showplot=False, *args):
+        for i in range(0, y.shape[1]):
+            plt.plot(
+                x[1:],
+                y[:, i],
+                label=r'$Q_%i$' % (i)
+            )
+        plt.title("Network Bus Reactive Power Loading Vs. Time", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.xlabel("Time(s)", fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.ylabel('Reactive Power (p.u.)', fontsize=LVNetworkPlotter.axesfontsize, style='italic')
+        plt.grid(color='black', linestyle='-', linewidth=LVNetworkPlotter.gridlinewidth)
+        plt.legend()
+        if showplot is False:
+            return
+        else:
+            return plt.show()
 
 
 class Ieee1547Plotter(LVNetworkPlotter):

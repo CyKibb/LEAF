@@ -92,3 +92,12 @@ def PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint):
     plotter.plotNetworkPhase(ts[:simbreakpoint], np.array(results[:, 0:4]), showplot=True)
 
     return
+
+
+def PlotBusPowerResponse(ts, busActivePower, busReactivePower):
+    plotter = Ieee1547Plotter
+
+    plotter.plotMultiBusActivePower(ts, busActivePower, showplot=True)
+    plotter.plotMultiBusReactivePower(ts, busReactivePower, showplot=True)
+
+    return

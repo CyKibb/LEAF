@@ -2,16 +2,16 @@
 from LoadModels.StaticLoads import ZIPpolynomialLoad, FreqDependentLoad, ExponentialLoad
 from GenerationModels.InverterModel import SinglePhaseInverter
 from NetworkModel.LowVoltageNetwork import LowVoltageNetwork
-from ThesisSimulations.LoadStepCase3.BusSettings import *
+from ThesisSimulations.LoadStepCase3_2.BusSettings import *
 from NetworkPlotter.PowerNetworkPlotter import *
 # External Imports
 import numpy as np
 
 
 # Define Simulation to be Executed in Main...
-def SimulateLVN_Case3(t_sim):
+def SimulateLVN_Case3_2(t_sim):
     # Define Time Array for Simulation
-    ts = np.linspace(0, t_sim, 1000000)
+    ts = np.linspace(0, t_sim, 100000)
     # Define Bus Array & Build Bus Objects
     bus = [Bus0(), Bus1(), Bus2(), Bus3()]
     # Define Network Connections & Coupling Between Buses
@@ -44,18 +44,45 @@ def SimulateLVN_Case3(t_sim):
         initialStates[0],
         initialStates[1],
         bus,
-        1.45,
-        LoadStep,
+        1.4,
+        LoadStep2,
         returnloads=True
     )
-    print("this was the sim breakpoint", simbreakpoint)
-    # Display Results...
     PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint)
+    PlotBusPowerResponse(
+        np.linspace(0, t_sim, np.array(network.GeneratorActivePowerOutput).shape[0] + 1),
+        np.squeeze(np.array(network.GeneratorActivePowerOutput), axis=2),
+        np.squeeze(np.array(network.GeneratorReactivePowerOutput), axis=2)
+    )
+    PlotBusPowerResponse(
+        np.linspace(0, t_sim, np.array(network.GeneratorActivePowerOutput).shape[0] + 1),
+        np.array(network.NetworkActivePower),
+        np.array(network.NetworkReactivePower)
+    )
     return
 
 
 # Define Network Disturbance Function
 def LoadStep(network, t, bus):
+    if 2 <= t[0] < 3.5:
+        network.Loads = [
+            bus[0].loadStep,
+            bus[1].loadStep,
+            bus[2].loadStep,
+            bus[3].loadStep
+        ]
+    else:
+        network.Loads = [
+            bus[0].initLoad,
+            bus[1].initLoad,
+            bus[2].initLoad,
+            bus[3].initLoad
+        ]
+    pass
+    return
+
+
+def LoadStep2(network, t, bus):
     if 1.5 <= t[0] < 2.4:
         network.Loads[0] = bus[0].loadStep
     elif 2.4 <= t[0] < 3.5:
@@ -75,25 +102,6 @@ def LoadStep(network, t, bus):
     return
 
 
-def LoadStep2(network, t, bus):
-    if 1.5 <= t[0] < 3.0:
-        network.Loads = [
-            bus[0].loadStep,
-            bus[1].loadStep,
-            bus[2].loadStep,
-            bus[3].loadStep
-        ]
-    else:
-        network.Loads = [
-            bus[0].initLoad,
-            bus[1].initLoad,
-            bus[2].initLoad,
-            bus[3].initLoad
-        ]
-    pass
-    return
-
-
 # Define Network Results Plotter
 def PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint):
     plotter = Ieee1547Plotter
@@ -104,13 +112,13 @@ def PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint):
 
     # Display Detailed Results
     plotter.plotNetworkFrequency(ts[:simbreakpoint], np.array(frequency), showplot=True)
-    plotter.plotMultiBusActivePower(ts[:simbreakpoint], loads[:, :, 0], showplot=True)
-    plotter.plotMultiBusReactivePower(ts[:simbreakpoint], loads[:, :, 1], showplot=True)
-    plotter.plotMultiBusPhaseError(ts[:simbreakpoint], np.array(results[:, 0:4]),
+    plotter.plotActivePowerLoading(ts[:simbreakpoint+1], loads[:, :, 0], showplot=True)
+    plotter.plotReactivePowerLoading(ts[:simbreakpoint+1], loads[:, :, 1], showplot=True)
+    plotter.plotMultiBusPhaseError(ts[:simbreakpoint+1], np.array(results[:, 0:4]),
                                    np.array(results[:, 0]), showplot=True)
-    plotter.plotNetworkVoltages(ts[:simbreakpoint], np.array(results[:, 4:8]), showplot=True)
-    plotter.plotNetworkPhase(ts[:simbreakpoint], np.sin(np.array(results[:, 0:3])), showplot=True)
-    plotter.plotNetworkPhase(ts[:simbreakpoint], np.array(results[:, 0:4]), showplot=True)
+    # plotter.plotNetworkVoltages(ts[:simbreakpoint], np.array(results[:, 4:8]), showplot=True)
+    # plotter.plotNetworkPhase(ts[:simbreakpoint], np.sin(np.array(results[:, 0:3])), showplot=True)
+    plotter.plotNetworkPhase(ts[:simbreakpoint+1], np.array(results[:, 0:4]), showplot=True)
 
     return
 
@@ -118,7 +126,7 @@ def PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint):
 def PlotBusPowerResponse(ts, busActivePower, busReactivePower):
     plotter = Ieee1547Plotter
 
-    plotter.plotMultiBusActivePower(ts, busActivePower, showplot=True)
-    plotter.plotMultiBusReactivePower(ts, busReactivePower, showplot=True)
+    plotter.plotMultiBusActivePower(ts[1:], busActivePower, showplot=True)
+    plotter.plotMultiBusReactivePower(ts[1:], busReactivePower, showplot=True)
 
     return

@@ -15,10 +15,10 @@ if __name__ == '__main__':
     print("Running Main Simulation Script")
 
     # Run Network Dynamic Simulation Case 1
-    # SimulateLVN_Case1(5)
+    SimulateLVN_Case1(5)
 
     # Run Network Dynamic Simulation Case 1
-    SimulateLVN_Case3_2(5)
+    # SimulateLVN_Case3_2(5)
 
     # Run Network Dynamic Simulation Case 2
     # SimulateLVN_Case2(5)
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     # SimulateLVN_Case3(6)
 
     # Run Network Dynamic Simulation Case 4
-    SimulateLVN_Case4(2000)
+    # SimulateLVN_Case4(2000)
 
     print("Simulaton Complete... Happy Analyzing :)")
     pass

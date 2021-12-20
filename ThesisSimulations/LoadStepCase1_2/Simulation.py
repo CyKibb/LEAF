@@ -11,7 +11,7 @@ import numpy as np
 # Define Simulation to be Executed in Main...
 def SimulateLVN_Case1_2(t_sim):
     # Define Time Array for Simulation
-    ts = np.linspace(0, t_sim, 1000000)
+    ts = np.linspace(0, t_sim, 100000)
     # Define Bus Array & Build Bus Objects
     bus = [Bus0(), Bus1(), Bus2(), Bus3()]
     # Define Network Connections & Coupling Between Buses
@@ -45,7 +45,7 @@ def SimulateLVN_Case1_2(t_sim):
         initialStates[1],
         bus,
         1.4,
-        LoadStep,
+        LoadStep2,
         returnloads=True
     )
     PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint)

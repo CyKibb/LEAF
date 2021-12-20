@@ -48,14 +48,14 @@ def SimulateLVN_Case3_2(t_sim):
         LoadStep2,
         returnloads=True
     )
-    PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint)
+    # PlotResults(ts, t_sim, results, frequency, loads, simbreakpoint)
     PlotBusPowerResponse(
-        np.linspace(0, t_sim, np.array(network.GeneratorActivePowerOutput).shape[0] + 1),
+        np.linspace(0, t_sim, np.array(network.GeneratorActivePowerOutput).shape[0] + 2),
         np.squeeze(np.array(network.GeneratorActivePowerOutput), axis=2),
         np.squeeze(np.array(network.GeneratorReactivePowerOutput), axis=2)
     )
     PlotBusPowerResponse(
-        np.linspace(0, t_sim, np.array(network.GeneratorActivePowerOutput).shape[0] + 1),
+        np.linspace(0, t_sim, np.array(network.GeneratorActivePowerOutput).shape[0] + 2),
         np.array(network.NetworkActivePower),
         np.array(network.NetworkReactivePower)
     )
